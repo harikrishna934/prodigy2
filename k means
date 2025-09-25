@@ -1,0 +1,42 @@
+# 1. Import libraries
+import pandas as pd
+import numpy as np
+import matplotlib.pyplot as plt
+from sklearn.cluster import KMeans
+from sklearn.preprocessing import StandardScaler
+
+# 2. Create a sample dataset (you can replace with real data)
+data = {
+    'customer_id': range(1, 21),
+    'annual_spending': [500, 700, 800, 2000, 2200, 2500, 2600, 3000, 1000, 1200,
+                        8000, 8500, 9000, 9500, 10000, 11000, 12000, 12500, 15000, 16000],
+    'purchase_frequency': [5, 7, 8, 20, 22, 25, 26, 30, 10, 12,
+                           50, 55, 58, 60, 65, 70, 72, 75, 80, 85]
+}
+
+df = pd.DataFrame(data)
+
+# 3. Select features for clustering
+X = df[['annual_spending', 'purchase_frequency']]
+
+# 4. Standardize the data (important for K-Means)
+scaler = StandardScaler()
+X_scaled = scaler.fit_transform(X)
+
+# 5. Apply K-Means Clustering
+kmeans = KMeans(n_clusters=3, random_state=42)
+df['cluster'] = kmeans.fit_predict(X_scaled)
+
+# 6. Visualize clusters
+plt.figure(figsize=(8, 5))
+plt.scatter(df['annual_spending'], df['purchase_frequency'], c=df['cluster'], cmap='viridis', s=100)
+plt.xlabel("Annual Spending")
+plt.ylabel("Purchase Frequency")
+plt.title("Customer Segments using K-Means")
+plt.show()
+
+# 7. Analyze cluster centers
+cluster_centers = scaler.inverse_transform(kmeans.cluster_centers_)
+print("Cluster Centers (Unscaled):")
+for i, center in enumerate(cluster_centers):
+    print(f"Cluster {i}: Annual Spending = {center[0]:.2f}, Purchase Frequency = {center[1]:.2f}")
